@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, Response
+from urllib.parse import quote
 import random
 import time
 
