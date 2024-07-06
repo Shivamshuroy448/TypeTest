@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .main-heading {
+            font-size: 2em;
+            font-weight: bold; /* Make the title bold */
+            text-align: center;
+            margin-top: 0.5em; /* Adjust top margin */
+            margin-bottom: 1em;
+            width: 100%;
+        }
+        .main-heading .left-text {
+            direction: ltr;
+        }
+        .main-heading .right-text {
+            direction: rtl;
+        }
+        .container {
+            text-align: left;
+            background-color: white;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        #timer-box {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4a4a4a;
+            margin-bottom: 1em;
+        }
+        #text-container {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 1em;
+            white-space: pre-wrap; /* Preserve line breaks */
+            overflow-wrap: break-word; /* Wrap long lines */
+            counter-reset: line-counter;
+            position: relative;
+        }
+        .line-numbers {
+            counter-increment: line-counter;
+            position: absolute;
+            left: 0;
+            width: 2.5em; /* Adjust based on number of digits */
+            text-align: right;
+            color: #999; /* Line number color */
+        }
+        .text-line {
+            margin-bottom: 0.5em; /* Adjust spacing between lines */
+            padding-left: 3em; /* Adjust to align text with line numbers */
+            display: flex;
+            align-items: center; /* Align text vertically with line numbers */
+        }
+        #user-input {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 1em;
+            padding: 0.5em;
+            box-sizing: border-box;
+            font-size: 1.2em;
+            resize: none; /* Disable textarea resizing */
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1em;
+        }
+        button {
+            padding: 0.5em 1em;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-heading">
+        <span class="left-text">Type</span>
+        <span class="right-text">Test</span>
+    </div>
+    <div class="container">
+        <div id="timer-box">Time: 0s</div>
+        <div id="text-container">
+            {% for line in text.split('\n') %}
+                <div class="text-line">
+                    <span class="line-numbers"></span>{{ line }}
+                </div>
+            {% endfor %}
+        </div>
+        <textarea id="user-input" placeholder="Start typing here..."></textarea>
+        <div class="button-group">
+            <button id="submit-btn">Submit</button>
+            <button id="reload-btn">Reload</button>
+        </div>
+        <p id="result"></p>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
