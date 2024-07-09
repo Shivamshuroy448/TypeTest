@@ -1,30 +1,28 @@
 let startTime;
 let timerInterval;
 let typingStarted = false;
-const originalText = document.getElementById('text-container').innerText;
+let originalText = "";
+let currentIndex = 0;
 const userInput = document.getElementById('user-input');
 const submitBtn = document.getElementById('submit-btn');
 const reloadBtn = document.getElementById('reload-btn');
 const result = document.getElementById('result');
 const timerDisplay = document.getElementById('timer-box');
+const textContainer = document.getElementById('text-container');
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+const practiceBtn = document.getElementById('practice-btn');
+const progressBar = document.getElementById('progress');
 
 function startTimer() {
     startTime = new Date().getTime();
     timerInterval = setInterval(() => {
         const currentTime = new Date().getTime();
-        const elapsedTime = currentTime - startTime; // in milliseconds
-
-        // Calculate seconds and milliseconds
+        const elapsedTime = currentTime - startTime;
         const seconds = Math.floor(elapsedTime / 1000);
         const milliseconds = elapsedTime % 1000;
-
-        // Display the timer with seconds and milliseconds
         timerDisplay.textContent = `Time: ${seconds}.${milliseconds.toString().padStart(3, '0')} secs`;
-
-    }, 100); // Update every 100 milliseconds for smoother display
+    }, 100);
 }
-
-
 
 function stopTimer() {
     clearInterval(timerInterval);
@@ -37,8 +35,11 @@ function resetTest() {
     stopTimer();
     startTime = null;
     typingStarted = false;
+    currentIndex = 0;
     userInput.disabled = false;
     submitBtn.disabled = false;
+    updateTextDisplay();
+    progressBar.style.width = '0%';
 }
 
 function submitTest() {
@@ -47,7 +48,7 @@ function submitTest() {
     userInput.disabled = true;
     submitBtn.disabled = true;
     const endTime = new Date();
-    const timeTaken = Math.max((endTime - startTime) / 1000, 0.01); // Convert to seconds, minimum 0.01
+    const timeTaken = Math.max((endTime - startTime) / 1000, 0.01);
     fetch('/check', {
         method: 'POST',
         headers: {
@@ -73,25 +74,58 @@ function submitTest() {
     });
 }
 
+function updateTextDisplay() {
+    let displayText = '';
+    for (let i = 0; i < originalText.length; i++) {
+        if (i < currentIndex) {
+            displayText += `<span class="highlight">${originalText[i]}</span>`;
+        } else if (i === currentIndex) {
+            displayText += `<span class="highlight" style="text-decoration: underline;">${originalText[i]}</span>`;
+        } else {
+            displayText += originalText[i];
+        }
+    }
+    textContainer.innerHTML = displayText;
+}
+
+function loadNewText() {
+    fetch('/get_text')
+        .then(response => response.text())
+        .then(text => {
+            originalText = text;
+            resetTest();
+        });
+}
+
 userInput.addEventListener('input', () => {
     if (!typingStarted) {
         typingStarted = true;
         startTimer();
     }
+    const currentText = userInput.value;
+    currentIndex = currentText.length;
+    updateTextDisplay();
+    const progress = (currentIndex / originalText.length) * 100;
+    progressBar.style.width = `${progress}%`;
 });
 
 userInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault(); // Prevent default behavior (new line)
+        event.preventDefault();
         submitTest();
     }
 });
 
 submitBtn.addEventListener('click', submitTest);
-reloadBtn.addEventListener('click', () => {
-    resetTest();
-    location.reload(); // This will reload the page, fetching a new random text
+reloadBtn.addEventListener('click', loadNewText);
+
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
 });
 
-// Reset the test when the page loads
-resetTest();
+practiceBtn.addEventListener('click', () => {
+    resetTest();
+});
+
+// Load initial text
+loadNewText();
