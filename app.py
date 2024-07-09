@@ -22,7 +22,11 @@ def countdown(t):
 
 @app.route('/')
 def index():
-    return render_template('index.html', text=random.choice(sample_texts))
+    return render_template('index.html')
+
+@app.route('/get_text')
+def get_text():
+    return random.choice(sample_texts)
 
 @app.route('/check', methods=['POST'])
 def check():
